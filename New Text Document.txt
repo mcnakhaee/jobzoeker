@@ -1,0 +1,1 @@
+pip install streamlit  # Add other dependencies as needed

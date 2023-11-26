@@ -24,7 +24,7 @@ jobs:
         pip install -r requirements.txt  # Replace with your actual requirements file
 
     - name: Build Streamlit App
-      run: streamlit build your_app_file.py  # Replace with the name of your Streamlit app file
+      run: streamlit build streamlit_dashboard.py  # Replace with the name of your Streamlit app file
 
   deploy:
     runs-on: ubuntu-latest
