@@ -14,6 +14,7 @@ def get_data():
     df = pd.read_csv('jobs.csv')
     df['date_posted'] = pd.to_datetime(df['date_posted'])
     df = df[['title','company','date_posted','description','search_term',"job_url"]].sort_values(by='date_posted', ascending=False)
+    df = df[~df['title'].str.contains('Intern', case=False, na=False)]
     # Apply the function to filter English rows
     english_rows = df[df['description'].apply(detect_language)]
     return english_rows
@@ -47,9 +48,17 @@ def main():
     "Search Term",
     search_terms,
     search_terms[0:2])
+
+
+    """titles = filtered_df.title.unique().tolist()
+    st_titles = st.multiselect(
+    "Job Titles",
+    titles,
+    titles)"""
     # Filter dataframe based on selections
     #filtered_df = df[[date_column, cat_column]]
-    filtered_df = filtered_df[filtered_df['search_term'].isin(sterms)]
+    #filtered_df = filtered_df[filtered_df['search_term'].isin(sterms)]
+    #filtered_df = filtered_df[filtered_df['title'].isin(st_titles)]
     # Display filtered dataframe
     st.write('### Filtered DataFrame')
     st.dataframe(filtered_df)
