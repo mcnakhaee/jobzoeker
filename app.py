@@ -26,7 +26,7 @@ def main():
     df = get_data()
 
     # Display dataframe
-    #st.write('### DataFrame')
+    st.write('### DataFrame')
     #st.dataframe(df)
 
     # Sidebar - Date selection
