@@ -4,6 +4,24 @@ on:
     branches:
       - main
 jobs:
+  collect_data:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        pip install jobspy # Replace with the actual command to install your Python dependencies
+
+    - name: Run Python script
+      run: python get_data.py  # Replace with the actual command to run your Python script
   build:
     runs-on: ubuntu-latest
     steps:
@@ -20,3 +38,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:release -a guarded-caverns-78210 web
+
+jobs:
+  - collect_data
+  - build
