@@ -18,7 +18,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install jobspy # Replace with the actual command to install your Python dependencies
+        pip install python-jobspy # Replace with the actual command to install your Python dependencies
 
     - name: Run Python script
       run: python get_data.py  # Replace with the actual command to run your Python script
