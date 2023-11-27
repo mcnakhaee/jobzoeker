@@ -1,8 +1,7 @@
 name: Build Docker image and deploy to Heroku
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 13 * * *'  # Run every day at 13:00 UTC
 jobs:
   collect_data:
     runs-on: ubuntu-latest
@@ -18,7 +17,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install python-jobspy # Replace with the actual command to install your Python dependencies
+        pip install -r requirements_collect_data.txt
 
     - name: Run Python script
       run: python get_data.py  # Replace with the actual command to run your Python script
