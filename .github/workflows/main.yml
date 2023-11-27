@@ -38,7 +38,3 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:release -a guarded-caverns-78210 web
-
-jobs:
-  - collect_data
-  - build
