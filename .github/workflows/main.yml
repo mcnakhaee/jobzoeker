@@ -1,7 +1,7 @@
 name: Build Docker image and deploy to Heroku
 on:
-  push:
-    branches: main
+  schedule:
+    - cron: '0 14 * * *'
 jobs:
   collect_data:
     runs-on: ubuntu-latest
