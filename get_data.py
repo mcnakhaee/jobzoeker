@@ -18,7 +18,7 @@ def collect_data():
         )
         jobs['search_term'] = search_term
         df_jobs.append(jobs)
-        time.sleep(40)
+        time.sleep(60)
 
     # Linkedin
     for search_term in search_terms:
@@ -31,7 +31,7 @@ def collect_data():
         )
         jobs['search_term'] = search_term
         df_jobs.append(jobs)
-        time.sleep(30)
+        time.sleep(60)
 
     merged_df = pd.concat(df_jobs, ignore_index=True)
     merged_df.to_csv('jobs.csv', index=False)
