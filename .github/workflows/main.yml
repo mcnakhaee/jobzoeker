@@ -1,5 +1,6 @@
 name: Build Docker image and deploy to Heroku
 on:
+  push:
   schedule:
     - cron: '0 14 * * *'
 jobs:

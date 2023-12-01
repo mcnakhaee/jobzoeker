@@ -31,7 +31,7 @@ def get_data():
 
 
 def main():
-    st.title('Streamlit DataFrame App')
+    st.title('Job Zoeker')
 
     # Load sample data
     df = get_data()
@@ -49,7 +49,7 @@ def main():
     cols_st = st.sidebar.multiselect(
         "Cols",
         cols,
-        ['title','date_posted','search_term','company','job_url','site','description'])
+        ['title', 'date_posted', 'search_term', 'company', 'job_url', 'site', 'description'])
     filtered_df = filtered_df[cols_st]
 
     search_terms = filtered_df.search_term.unique().tolist()
@@ -59,24 +59,26 @@ def main():
         search_terms[0:2])
 
     filtered_df = filtered_df[filtered_df['search_term'].isin(sterms)]
-    
+
     sites = filtered_df.site.unique().tolist()
     site_st = st.sidebar.multiselect(
         "Site",
         sites,
         sites[0])
+    filtered_df = filtered_df[filtered_df['site'].isin(site_st)]
     selected_row_index = st.selectbox("Select a row", filtered_df.index)
     # Display the selected row's 'description' as a text field
     selected_description = filtered_df.loc[selected_row_index, 'description']
     description_input = st.text_area("Description", selected_description)
-    st.write("**ID:**", "**" + filtered_df.loc[selected_row_index, 'title'] + ' at ' + filtered_df.loc[selected_row_index, 'company'] +"**")
+    st.write("**ID:**", "**" + filtered_df.loc[selected_row_index, 'title'] +
+             ' at ' + filtered_df.loc[selected_row_index, 'company'] + "**")
     # Display DataFrame with checkboxes for row selection
     selected_row_indices = st.multiselect("Select rows to delete", df.index)
     # Display a button to delete selected rows
     if st.button("Delete Selected Rows"):
         # Delete selected rows from the DataFrame
         df.drop(index=selected_row_indices, inplace=True)
-        
+
         # Save the updated DataFrame to the source file (e.g., CSV)
         df.to_csv("jobs.csv", index=False)
 
