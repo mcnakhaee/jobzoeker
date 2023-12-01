@@ -38,8 +38,7 @@ def collect_data():
 
 
 def main():
-    # collect_data()
-    print('x')
+    collect_data()
 
 
 if __name__ == "__main__":
