@@ -5,6 +5,7 @@ search_terms = ['r', 'ggplot', 'data analyst', 'analytics engineer',
                 'data scientist', 'pyspark', 'data visualization', 'data journalist']
 # Indeed
 df_jobs = []
+old_data = pd.read_csv('jobs.csv')
 
 
 def collect_data():
@@ -33,7 +34,8 @@ def collect_data():
         df_jobs.append(jobs)
         time.sleep(60)
 
-    merged_df = pd.concat(df_jobs, ignore_index=True)
+    df_jobs_all = df_jobs.append(old_data)
+    merged_df = pd.concat(df_jobs_all, ignore_index=True)
     merged_df.to_csv('jobs.csv', index=False)
 
 
