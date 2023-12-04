@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import langid
+
 pd.set_option('display.max_colwidth', None)
 # Function to identify language using langid
 
@@ -14,7 +15,7 @@ def detect_language(text):
 
 def detect_lang(x):
     try:
-        lang, _ = langid.classify(text)
+        lang, _ = langid.classify(x)
         return lang
     except:
         return 'not_detected'
@@ -27,9 +28,16 @@ def get_data():
     df = df[~df['title'].str.contains('Intern', case=False, na=False)]
     # Apply the function to filter English rows
     df['lang'] = df['description'].apply(lambda x: detect_lang(x))
+    df = df[df['lang'] == 'en']
     return df
 
-
+# Function to filter DataFrame based on user input
+def filter_dataframe(data_frame, column, keyword):
+    if keyword:
+        return data_frame[data_frame[column].str.contains(keyword, case=False)]
+    else:
+        return data_frame
+    
 def main():
     st.title('Job Zoeker')
 
@@ -49,7 +57,7 @@ def main():
     cols_st = st.sidebar.multiselect(
         "Cols",
         cols,
-        ['title', 'date_posted', 'search_term', 'company', 'job_url', 'site', 'description'])
+        ['title', 'date_posted', 'search_term', 'company', 'job_url', 'site', 'description','lang'])
     filtered_df = filtered_df[cols_st]
 
     search_terms = filtered_df.search_term.unique().tolist()
@@ -66,6 +74,15 @@ def main():
         sites,
         sites[0])
     filtered_df = filtered_df[filtered_df['site'].isin(site_st)]
+    # language filter
+    langs = filtered_df.site.unique().tolist()
+
+    # Search bar
+    filter_keyword = st.sidebar.text_input(f"Enter description Value to Filter")
+
+    # Apply filter to DataFrame
+    filtered_df = filter_dataframe(filtered_df, 'description', filter_keyword)
+
     selected_row_index = st.selectbox("Select a row", filtered_df.index)
     # Display the selected row's 'description' as a text field
     selected_description = filtered_df.loc[selected_row_index, 'description']

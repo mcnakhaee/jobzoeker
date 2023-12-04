@@ -14,7 +14,7 @@ def collect_data():
             site_name=["indeed"],
             search_term=search_term,
             location="Netherlands",
-            results_wanted=30,
+            results_wanted=40,
             country_indeed='Netherlands'  # only needed for indeed / glassdoor
         )
         jobs['search_term'] = search_term
@@ -27,16 +27,17 @@ def collect_data():
             site_name=["linkedin"],
             search_term=search_term,
             location="Netherlands",
-            results_wanted=30,
+            results_wanted=40,
             country_indeed='Netherlands'  # only needed for indeed / glassdoor
         )
         jobs['search_term'] = search_term
         df_jobs.append(jobs)
         time.sleep(60)
 
-    df_jobs_all = df_jobs.append(old_data)
-    merged_df = pd.concat(df_jobs_all, ignore_index=True)
-    merged_df.to_csv('jobs.csv', index=False)
+    merged_df = pd.concat(df_jobs, ignore_index=True)
+    all_jobs = pd.concat([old_data,merged_df], ignore_index=True)
+    all_jobs =all_jobs.drop_duplicates()
+    all_jobs.to_csv('jobs.csv', index=False)
 
 
 def main():
