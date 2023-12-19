@@ -6,6 +6,16 @@ import langid
 
 pd.set_option('display.max_colwidth', None)
 # Function to identify language using langid
+# Function to format URLs as clickable links
+def format_url(url):
+    return f'<a href="{url}" target="_blank">{url}</a>'
+
+# Function to truncate text in the 'Description' column
+def truncate_text(text, max_length=30):
+    if len(text) > max_length:
+        return text[:max_length-3] + "..."
+    else:
+        return text
 
 
 def detect_language(text):
@@ -102,8 +112,8 @@ def main():
         # Display a confirmation message
         st.success("Selected rows deleted successfully!")
 
-    st.dataframe(filtered_df)
-
+    #st.dataframe(filtered_df)
+    st.table(filtered_df.style.format({'description': truncate_text}))
 
 if __name__ == '__main__':
     main()
