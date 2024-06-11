@@ -7,6 +7,10 @@ import openai
 import os
 from dotenv import load_dotenv
 import os
+#OPENAI_KEY = os.getenv('OPENAI_KEY')
+
+openai = os.getenv(OPENAI_KEY)
+client = openai.OpenAI(api_key=openai)
 
 pd.set_option('display.max_colwidth', None)
 # Function to format URLs as clickable links
@@ -113,18 +117,18 @@ def main():
              ' at ' + filtered_df.loc[selected_row_index, 'company'] + "**")
 
     # ChatGPT
-    #prompt = f"""
-    #This is a job description in the field of data science,
-    #your task is to summarize the text into the technologies needed for this job, minimum years of experience, education requrement and write each of them them into a single sentence.
-    #if any of them is not provided please specify it as 'not provided'.
-    #Also summarize the profile of the ideal candidate for this job in 1 or 2 sentences.
-    #Also extract the responsibilities of the candidate in 1 or 2 sentences.
-    #based on the responsibilties provide a few resources/learning materials to get started with this job title 
-    #```{selected_description}```
-    #"""
+    prompt = f"""
+    This is a job description in the field of data science,
+    your task is to summarize the text into the technologies needed for this job, minimum years of experience, education requrement and write each of them them into a single sentence.
+    if any of them is not provided please specify it as 'not provided'.
+    Also summarize the profile of the ideal candidate for this job in 1 or 2 sentences.
+    Also extract the responsibilities of the candidate in 1 or 2 sentences.
+    based on the responsibilties provide a few resources/learning materials to get started with this job title 
+    ```{selected_description}```
+    """
 
-    #response = get_completion(prompt)
-    #st.write(response)
+    response = get_completion(prompt)
+    st.write(response)
     # Display DataFrame with checkboxes for row selection
     selected_row_indices = st.multiselect("Select rows to delete", df.index)
     # Display a button to delete selected rows
