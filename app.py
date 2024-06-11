@@ -3,9 +3,12 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import langid
+import openai
+import os
+from dotenv import load_dotenv
+import os
 
 pd.set_option('display.max_colwidth', None)
-# Function to identify language using langid
 # Function to format URLs as clickable links
 def format_url(url):
     return f'<a href="{url}" target="_blank">{url}</a>'
@@ -47,7 +50,16 @@ def filter_dataframe(data_frame, column, keyword):
         return data_frame[data_frame[column].str.contains(keyword, case=False)]
     else:
         return data_frame
-    
+
+def get_completion(prompt, model="gpt-3.5-turbo"):
+    messages = [{"role": "user", "content": prompt}]
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=0
+    )
+    return response.choices[0].message.content
+
 def main():
     st.title('Job Zoeker')
 
@@ -99,6 +111,20 @@ def main():
     description_input = st.text_area("Description", selected_description)
     st.write("**ID:**", "**" + filtered_df.loc[selected_row_index, 'title'] +
              ' at ' + filtered_df.loc[selected_row_index, 'company'] + "**")
+
+    # ChatGPT
+    #prompt = f"""
+    #This is a job description in the field of data science,
+    #your task is to summarize the text into the technologies needed for this job, minimum years of experience, education requrement and write each of them them into a single sentence.
+    #if any of them is not provided please specify it as 'not provided'.
+    #Also summarize the profile of the ideal candidate for this job in 1 or 2 sentences.
+    #Also extract the responsibilities of the candidate in 1 or 2 sentences.
+    #based on the responsibilties provide a few resources/learning materials to get started with this job title 
+    #```{selected_description}```
+    #"""
+
+    #response = get_completion(prompt)
+    #st.write(response)
     # Display DataFrame with checkboxes for row selection
     selected_row_indices = st.multiselect("Select rows to delete", df.index)
     # Display a button to delete selected rows
