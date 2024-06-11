@@ -6,10 +6,9 @@ import langid
 import openai
 import os
 import os
-#OPENAI_KEY = os.getenv('OPENAI_KEY')
-
-openai = os.getenv(OPENAI_KEY)
-client = openai.OpenAI(api_key=openai)
+from my_secrets import *
+openai_key = get_openai_key()
+client = openai.OpenAI(api_key=openai_key)
 
 pd.set_option('display.max_colwidth', None)
 # Function to format URLs as clickable links
