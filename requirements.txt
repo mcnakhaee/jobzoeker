@@ -2,3 +2,4 @@ streamlit
 pandas
 langid
 openai
+python-dotenv
