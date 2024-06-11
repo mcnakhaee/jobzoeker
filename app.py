@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import langid
 import openai
 import os
-from dotenv import load_dotenv
 import os
 #OPENAI_KEY = os.getenv('OPENAI_KEY')
 
