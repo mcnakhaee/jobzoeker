@@ -5,5 +5,6 @@ COPY requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
 COPY . .
 # Copy the secret file explicitly
-COPY my_secrets.py ./my_secrets.py
+COPY ./my_secrets.py ./my_secrets.py
+COPY . .
 CMD streamlit run app.py --server.port $PORT

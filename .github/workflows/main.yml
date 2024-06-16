@@ -22,6 +22,7 @@ jobs:
       run: |
         pip install -r requirements_collect_data.txt
 
+
   build:
     runs-on: ubuntu-latest
     steps:
