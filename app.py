@@ -6,7 +6,7 @@ import langid
 import openai
 import os
 import os
-from my_secrets import *
+from secret import *
 openai_key = get_openai_key()
 openai_key = get_openai_key()
 client = openai.OpenAI(api_key=openai_key)
