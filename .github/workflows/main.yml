@@ -35,7 +35,10 @@ jobs:
       run: |
         echo "def get_openai_key():" > secret.py
         echo "    return '${{ secrets.OPENAI_KEY }}'" >> secret.py
-
+    - name: Create secret.py file
+      run: |
+        echo "def get_openai_key():" > secret.py
+        echo "    return '${{ secrets.OPENAI_KEY }}'" >> my_secrets.py
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
