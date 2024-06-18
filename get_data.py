@@ -65,7 +65,7 @@ def collect_data():
     # Calculate the first and last day of the last month
     first_day_last_month = (today.replace(day=1) - timedelta(days=1)).replace(day=1)
     last_day_last_month = today.replace(day=1) - timedelta(days=1)
-    filtered_df = filtered_df[(filtered_df['date_posted'] >= first_day_last_month) & (filtered_df['date_posted'] <= last_day_last_month)]
+    filtered_df = filtered_df[(filtered_df['date_posted'] >= first_day_last_month) ]
     filtered_df.to_csv('jobs.csv', index=False)
     all_jobs.to_csv('all_jobs.csv', index=False)
 
