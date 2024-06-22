@@ -6,10 +6,11 @@ from datetime import datetime, timedelta
 import langid
 import openai
 import os
-from my_secrets import *
+
 
 locations = ['Den Haag','Amsterdam','Rotterdam','Delft','Utrecht','Leiden','Zuid-Holland','Werk van thuis, NL']
 try:
+    from my_secrets import get_openai_key
     openai_key = get_openai_key()
 except:
     openai_key = api_key = os.getenv("OPENAI_KEY")
