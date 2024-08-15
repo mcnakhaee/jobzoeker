@@ -113,7 +113,7 @@ def main():
     Calls the `collect_data()` function to collect and filter job data.
     """
 
-    collect_data()
+    collect_data(merged_df)
 
 
 if __name__ == "__main__":
