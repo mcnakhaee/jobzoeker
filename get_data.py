@@ -13,8 +13,7 @@ search_terms = ['r', 'ggplot', 'data analyst', 'analytics engineer',
 today = datetime.today()
 
 df_jobs = []
-old_data = pd.read_csv('jobs.csv')
-merged_df = old_data
+merged_df = pd.read_csv('jobs.csv')
 
 
 def detect_language(text):
@@ -48,7 +47,7 @@ def detect_lang(x):
         return 'not_detected'
 
 
-def collect_data():
+def collect_data(merged_df):
     """
     Collects job data from different sources and filters the results.
 
