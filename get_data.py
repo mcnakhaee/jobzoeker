@@ -58,7 +58,7 @@ def collect_data(merged_df):
     """
     for search_term in search_terms:
         jobs = scrape_jobs(
-            site_name=["indeed", "glassdoor"],
+            site_name=["indeed", "glassdoor","linkedin"],
             search_term=search_term,
             location="Netherlands",
             results_wanted=40,
@@ -68,25 +68,11 @@ def collect_data(merged_df):
         merged_df = pd.concat([merged_df,jobs], ignore_index=True)
         time.sleep(60)
 
-    # Linkedin
-    for search_term in search_terms:
-        jobs = scrape_jobs(
-            site_name=["linkedin"],
-            search_term=search_term,
-            location="Netherlands",
-            results_wanted=40,
-            country_indeed='Netherlands'  # only needed for indeed / glassdoor
-        )
-        jobs['search_term'] = search_term
-        merged_df = pd.concat([merged_df,jobs], ignore_index=True)
-        time.sleep(60)
 
-    #merged_df = pd.concat(df_jobs, ignore_index=True)
-    #all_jobs = pd.concat([old_data, merged_df], ignore_index=True)
     all_jobs = merged_df.drop_duplicates()
     all_jobs['lang'] = all_jobs['description'].apply(lambda x: detect_lang(x))
     filtered_df = all_jobs[all_jobs['lang'] == 'en']
-    filtered_df = filtered_df[filtered_df['description'].str.contains('Python', case=False, na=False)]
+    #filtered_df = filtered_df[filtered_df['description'].str.contains('Python', case=False, na=False)]
     filtered_df = filtered_df[~filtered_df['title'].str.contains('PhD', case=False, na=False)]
     filtered_df = filtered_df[~filtered_df['title'].str.contains('Manager', case=False, na=False)]
     filtered_df = filtered_df[~filtered_df['title'].str.contains('Intern', case=False, na=False)]
