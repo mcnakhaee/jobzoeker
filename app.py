@@ -7,13 +7,18 @@ import langid
 import openai
 import os
 
+x1 = ['r', 'ggplot', 'data analyst', 'analytics engineer',
+                'data scientist', 'pyspark', 'data visualization', 'data journalist',
+                         'data engineer', 'Data Reporting','Big Data','Statistical Analyst',
+                         'data pipeline', 'R Shiny','R Developer']
+x2 = ['programm manager','HR','people operations',
+                        'program coordinator',
+                        'event coordinator','event manager','events',
+                        'training', 'training coordinator',
+                        'partnerships']
 
 locations = ['Den Haag','Amsterdam','Rotterdam','Delft','Utrecht','Leiden','Zuid-Holland','Werk van thuis, NL']
-try:
-    from my_secrets import get_openai_key
-    openai_key = get_openai_key()
-except:
-    openai_key = api_key = os.getenv("OPENAI_KEY")
+openai_key = api_key = os.getenv("OPENAI_KEY")
 client = openai.OpenAI(api_key=openai_key)
 
 pd.set_option('display.max_colwidth', None)
@@ -48,92 +53,108 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
     )
     return response.choices[0].message.content
 
+# Function to filter dataframe based on description keywords
+def filter_dataframe(df, column, keyword):
+    if keyword:
+        return df[df[column].str.contains(keyword, case=False, na=False)]
+    return df
 
-def main():
-    st.title('Job Zoeker')
-
-    df = get_data()
-
-    st.sidebar.header('Select Date')
-    end_date = st.sidebar.date_input("End date", max(df['date_posted']))
-
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=30)
-    filtered_df = df[(df['date_posted'] >= start_date)
-                     & (df['date_posted'] <= end_date)]
-
+# Function to display filtered dataframe with interactive elements
+def display_filtered_data(filtered_df):
+    # Select columns to display
     cols = filtered_df.columns.tolist()
     cols_st = st.sidebar.multiselect(
-        "Cols",
+        "Columns to Display",
         cols,
-        ['title', 'date_posted', 'search_term', 'company','location', 'job_url', 'site', 'description', 'lang'])
+        default=['title', 'date_posted', 'search_term', 'company', 'location', 'job_url', 'site', 'description', 'lang']
+    )
     filtered_df = filtered_df[cols_st]
 
-    search_terms = filtered_df.search_term.unique().tolist()
-    sterms = st.sidebar.multiselect(
-        "Search Term",
-        search_terms,
-        search_terms[0:2])
+    # Search term filter
+    search_terms = filtered_df['search_term'].unique().tolist()
+    selected_terms = st.sidebar.multiselect("Search Term", search_terms, default=search_terms)
+    filtered_df = filtered_df[filtered_df['search_term'].isin(selected_terms)]
 
-    filtered_df = filtered_df[filtered_df['search_term'].isin(sterms)]
-    location_st = st.sidebar.multiselect(
-        "Location",
-        locations,
-        locations[0]
-    )
-    #filtered_df = filtered_df[filtered_df['location'].str.contains('|'.join(location_st))]
-    #filtered_df = filtered_df[filtered_df['location'].isin(location_st)]
-    sites = filtered_df.site.unique().tolist()
-    site_st = st.sidebar.multiselect(
-        "Site",
-        sites,
-        sites[0])
-    filtered_df = filtered_df[filtered_df['site'].isin(site_st)]
+    # Location filter
+    locations = filtered_df['location'].unique().tolist()
+    selected_locations = st.sidebar.multiselect("Location", locations, default=locations)
+    filtered_df = filtered_df[filtered_df['location'].isin(selected_locations)]
 
-    filter_keyword = st.sidebar.text_input(f"Enter description Value to Filter")
+    # Site filter
+    sites = filtered_df['site'].unique().tolist()
+    selected_sites = st.sidebar.multiselect("Site", sites, default=sites)
+    filtered_df = filtered_df[filtered_df['site'].isin(selected_sites)]
 
+    # Description filter
+    filter_keyword = st.sidebar.text_input("Enter description keyword to filter")
     filtered_df = filter_dataframe(filtered_df, 'description', filter_keyword)
 
-    selected_row_index = st.selectbox("Select a row", filtered_df.index)
-    selected_description = filtered_df.loc[selected_row_index, 'description']
-    description_input = st.text_area("Description", selected_description)
-    st.write("**ID:**", "**" + filtered_df.loc[selected_row_index, 'title'] +
-             ' at ' + filtered_df.loc[selected_row_index, 'company'] + "**")
+    # Select and display a row's details
+    if not filtered_df.empty:
+        selected_row_index = st.selectbox("Select a row", filtered_df.index)
+        selected_description = filtered_df.loc[selected_row_index, 'description']
+        st.text_area("Description", selected_description)
+        job_title = filtered_df.loc[selected_row_index, 'title']
+        company = filtered_df.loc[selected_row_index, 'company']
+        st.write(f"**ID:** **{job_title} at {company}**")
 
-    prompt = f"""
-    This is a job description in the field of data science,
-    your task is to summarize the text into the technologies needed for this job, minimum years of experience, education requrement and write each of them them into a single sentence.
-    if any of them is not provided please specify it as 'not provided'.
-    Also summarize the profile of the ideal candidate for this job in 1 or 2 sentences.
-    Also extract the responsibilities of the candidate in 1 or 2 sentences.
-    based on the responsibilties provide a few resources/learning materials to get started with this job title 
-    ```{selected_description}```
-    """
+        # Generate and display response for job description analysis
+        job_description_prompt = f"""
+        This is a job description in the field of data science.
+        Your task is to summarize the text into the technologies needed for this job, minimum years of experience, education requirement, and write each of them into a single sentence. 
+        If any of them is not provided, please specify it as 'not provided'. 
+        Also, summarize the profile of the ideal candidate for this job in 1 or 2 sentences. 
+        Extract the responsibilities of the candidate in 1 or 2 sentences. Based on the responsibilities, provide a few resources/learning materials to get started with this job title:
+        {selected_description}
+        """
+        response = get_completion(job_description_prompt)
+        st.write(response)
 
-    response = get_completion(prompt)
-    st.write(response)
+        # Generate and display response for company profile analysis
+        company_prompt = f"""
+        This is the name of the company that posted the job. Your task is to summarize the company profile, mission, culture, and values in 1 or 2 sentences:
+        {company}
+        """
+        response = get_completion(company_prompt)
+        st.write(response)
 
-
-
-    selected_company = filtered_df.loc[selected_row_index, 'company']
-    company_input = st.text_area("Company", selected_company)
-
-    prompt = f"""
-    this is the name of company that posted the job, your task is to summarize the company profile, the company's mission, the company's culture and the company's values in 1 or 2 sentences.
-    ```{selected_company}```
-    """
-
-    response = get_completion(prompt)
-    st.write(response)
-
-    selected_row_indices = st.multiselect("Select rows to delete", df.index)
+    # Option to delete selected rows
+    selected_row_indices = st.multiselect("Select rows to delete", filtered_df.index)
     if st.button("Delete Selected Rows"):
         df.drop(index=selected_row_indices, inplace=True)
         df.to_csv("jobs.csv", index=False)
         st.success("Selected rows deleted successfully!")
 
+    # Display the filtered dataframe
     st.table(filtered_df.style.format({'description': truncate_text}))
 
+# Main function to handle page navigation and display
+def main():
+    st.title('Job Zoeker')
 
-if __name__ == '__main__':
+    # Fetch the data
+    df = get_data()
+
+    # Sidebar for date filter
+    st.sidebar.header('Filters')
+    end_date = st.sidebar.date_input("End date", datetime.now())
+    start_date = end_date - timedelta(days=30)
+    df['date_posted'] = pd.to_datetime(df['date_posted'])  # Ensure date_posted is in datetime format
+    # Convert start_date and end_date to pandas datetime
+    start_date = pd.to_datetime(start_date)
+    end_date = pd.to_datetime(end_date)
+    filtered_df = df[(df['date_posted'] >= start_date) & (df['date_posted'] <= end_date)]
+
+    # Page navigation
+    page = st.sidebar.selectbox("Select Page", ["Muhammad", "Andreea"])
+
+    if page == "Muhammad":
+        filtered_df_x1 = filtered_df[filtered_df['search_term'].isin(x1)]
+        display_filtered_data(filtered_df_x1)
+    elif page == "Andreea":
+        filtered_df_x2 = filtered_df[filtered_df['search_term'].isin(x2)]
+        display_filtered_data(filtered_df_x2)
+
+# Run the app
+if __name__ == "__main__":
     main()
