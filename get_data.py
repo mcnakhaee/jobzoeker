@@ -11,7 +11,7 @@ search_terms_muhammad = ['r', 'ggplot', 'data analyst', 'analytics engineer',
                 'data scientist', 'pyspark', 'data visualization', 'data journalist',
                          'data engineer', 'Data Reporting','Big Data','Statistical Analyst',
                          'data pipeline', 'R Shiny','R Developer']
-search_terms_andreea = ['programm manager','HR','people operations',
+search_terms_andreea = ['NGO','programm manager','HR','people operations',
                         'program coordinator',
                         'event coordinator','event manager',
                          'training coordinator',
