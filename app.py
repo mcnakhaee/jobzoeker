@@ -76,9 +76,9 @@ def display_filtered_data(filtered_df):
     filtered_df = filtered_df[filtered_df['search_term'].isin(selected_terms)]
 
     # Location filter
-    locations = filtered_df['location'].unique().tolist()
-    selected_locations = st.sidebar.multiselect("Location", locations, default=locations)
-    filtered_df = filtered_df[filtered_df['location'].isin(selected_locations)]
+    #locations = filtered_df['location'].unique().tolist()
+    #selected_locations = st.sidebar.multiselect("Location", locations, default=locations)
+    #filtered_df = filtered_df[filtered_df['location'].isin(selected_locations)]
 
     # Site filter
     sites = filtered_df['site'].unique().tolist()
