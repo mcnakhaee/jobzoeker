@@ -79,7 +79,7 @@ def collect_data(merged_df):
             )
             jobs['search_term'] = search_term
             merged_df = pd.concat([merged_df,jobs], ignore_index=True)
-            time.sleep(10)
+            time.sleep(5)
 
 
     all_jobs = merged_df.drop_duplicates()
