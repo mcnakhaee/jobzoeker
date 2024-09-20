@@ -17,11 +17,16 @@ x2 = ['programm manager','HR','people operations',
                         'training', 'training coordinator',
                         'partnerships']
 
-locations = ['Den Haag','Amsterdam','Rotterdam','Delft','Utrecht','Leiden','Zuid-Holland','Werk van thuis, NL']
+cities_to_filter = ['Den Haag','Amsterdam','Rotterdam','Delft','Utrecht','Leiden','Zuid-Holland','Werk van thuis, NL']
 openai_key = api_key = os.getenv("OPENAI_KEY")
 client = openai.OpenAI(api_key=openai_key)
 
 pd.set_option('display.max_colwidth', None)
+
+
+# Function to extract the city name (first part before any commas)
+def extract_city_name(city):
+    return city.split(',')[0].strip()  # Split by comma and take the first part, strip to remove any spaces
 
 # Function to truncate text in the 'Description' column
 def truncate_text(text, max_length=30):
@@ -75,11 +80,12 @@ def display_filtered_data(filtered_df):
     selected_terms = st.sidebar.multiselect("Search Term", search_terms, default=search_terms)
     filtered_df = filtered_df[filtered_df['search_term'].isin(selected_terms)]
 
+
     # Location filter
     #locations = filtered_df['location'].unique().tolist()
     #selected_locations = st.sidebar.multiselect("Location", locations, default=locations)
     #filtered_df = filtered_df[filtered_df['location'].isin(selected_locations)]
-
+    #st.write(filtered_df['location'].value_counts().index)
     # Site filter
     sites = filtered_df['site'].unique().tolist()
     selected_sites = st.sidebar.multiselect("Site", sites, default=sites)
@@ -97,33 +103,49 @@ def display_filtered_data(filtered_df):
         job_title = filtered_df.loc[selected_row_index, 'title']
         company = filtered_df.loc[selected_row_index, 'company']
         st.write(f"**ID:** **{job_title} at {company}**")
+        #filtered_df['city_name'] = filtered_df['location'].apply(extract_city_name)
 
+        #pattern = '|'.join(cities_to_filter)
+        #st.write(list(filtered_df['city_name'].value_counts().index))
+        # Filter the dataframe based on whether the city column contains any of the specified city names
+        #dddf = filtered_df[filtered_df['location'].str.contains(pattern, case=False, regex=True)]
+        #st.write(dddf.shape)
+        #st.table(dddf.head(5))
         # Generate and display response for job description analysis
         job_description_prompt = f"""
         This is a job description in the field of data science.
-        Your task is to summarize the text into the technologies needed for this job, minimum years of experience, education requirement, and write each of them into a single sentence. 
-        If any of them is not provided, please specify it as 'not provided'. 
-        Also, summarize the profile of the ideal candidate for this job in 1 or 2 sentences. 
-        Extract the responsibilities of the candidate in 1 or 2 sentences. Based on the responsibilities, provide a few resources/learning materials to get started with this job title:
+        Your task is to summarize the job description and provide the following information in separate lines:
+        1.Technologies required for this job,
+        2.Minimum years of experience,
+        3.Education requirement
+        4. Salary (if provided)
+        5. Contact person (if provided)
+        6. Duration
+        7. summarize the company profile, such as size, mission, culture, and values in 1 or 2 sentences
+        
+        Also based on the job description and the following list of tasks i've done in my current job compose a 3-paragraphs cover letter:
+        /Tasks
+    - Delivered comprehensive analysis and developed interactive  PowerBI  dashboards for key stakeholders, including the Customer Success and Robotics teams 
+    - Designed and implemented robust data models to integrate data from new acquisitions, improving data consistency and accessibility across the organization 
+    - Managed and monitored machine learning models for the Customer Intelligence team, ensuring optimal performance and timely updates 
+    - Optimized data transformation processes, resulting in significant cost savings of thousands of euros through improved efficiency and resource utilization. 
+    - Implemented data quality checks and validation processes 
+    style the answer
+         
         {selected_description}
         """
-        response = get_completion(job_description_prompt)
-        st.write(response)
 
-        # Generate and display response for company profile analysis
-        company_prompt = f"""
-        This is the name of the company that posted the job. Your task is to summarize the company profile, mission, culture, and values in 1 or 2 sentences:
-        {company}
-        """
-        response = get_completion(company_prompt)
+
+    if st.button("Generate summary/cover letter"):
+        response = get_completion(job_description_prompt)
         st.write(response)
 
     # Option to delete selected rows
     selected_row_indices = st.multiselect("Select rows to delete", filtered_df.index)
-    if st.button("Delete Selected Rows"):
-        df.drop(index=selected_row_indices, inplace=True)
-        df.to_csv("jobs.csv", index=False)
-        st.success("Selected rows deleted successfully!")
+    #if st.button("Delete Selected Rows"):
+    #    df.drop(index=selected_row_indices, inplace=True)
+    #    df.to_csv("jobs.csv", index=False)
+    #    st.success("Selected rows deleted successfully!")
 
     # Display the filtered dataframe
     st.table(filtered_df.style.format({'description': truncate_text}))
