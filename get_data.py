@@ -82,7 +82,7 @@ def collect_data(merged_df):
             time.sleep(5)
 
 
-    all_jobs = merged_df.drop_duplicates(subset=['title', 'company'], inplace=True)
+    all_jobs = merged_df.drop_duplicates(subset=['title', 'company','description'], inplace=True)
     all_jobs['lang'] = all_jobs['description'].apply(lambda x: detect_lang(x))
     filtered_df = all_jobs[all_jobs['lang'] == 'en']
     #filtered_df = filtered_df[filtered_df['description'].str.contains('Python', case=False, na=False)]
