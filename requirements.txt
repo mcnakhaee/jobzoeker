@@ -3,3 +3,4 @@ pandas
 langid
 openai
 python-dotenv
+notion-client
