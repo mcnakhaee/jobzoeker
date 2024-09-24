@@ -20,7 +20,7 @@ x2 = ['programm manager','HR','people operations',
                         'training', 'training coordinator',
                         'partnerships']
 
-cities_to_filter = ['Den Haag','Amsterdam','Rotterdam','Delft','Utrecht','Leiden','Zuid-Holland','Werk van thuis, NL']
+cities_to_filter = ['Den Haag','Amsterdam','Rotterdam','Delft','Utrecht','Leiden','Zuid-Holland','Werk van thuis]
 openai_key = os.getenv("OPENAI_KEY")
 notion_key = os.getenv("notion-key")
 parent_page_id = notion_key = os.getenv("parent_page_id")
