@@ -46,10 +46,14 @@ jobs:
         - name: Build and push
           env:
             HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+            notion-key: ${{ secrets.notion-key }}
             OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+            parent_page_id: ${{ secrets.parent_page_id }}
           run: heroku container:push -a guarded-caverns-78210 web
         - name: Release
           env:
             HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+            notion-key: ${{ secrets.notion-key }}
             OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+            parent_page_id: ${{ secrets.parent_page_id }}
           run: heroku container:release -a guarded-caverns-78210 web
