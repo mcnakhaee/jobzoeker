@@ -22,7 +22,7 @@ x2 = ['programm manager','HR','people operations',
 
 cities_to_filter = ['Den Haag','Amsterdam','Rotterdam','Delft','Utrecht','Leiden','Zuid-Holland','Werk van thuis']
 openai_key = os.getenv("OPENAI_KEY")
-notion_key = os.getenv("notion-key")
+notion_key = os.getenv("NOTION_KEY")
 parent_page_id = os.getenv("parent_page_id")
 
 client = openai.OpenAI(api_key=openai_key)
