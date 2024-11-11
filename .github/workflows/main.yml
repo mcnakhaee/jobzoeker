@@ -4,7 +4,8 @@ on:
     branches:
       - main  # Adjust to your default branch
   schedule:
-    - cron: '0 8 */2 * *'
+    - cron: '0 8 */2 * *'  # Run at 8 AM every other day
+    - cron: '0 20 1-31/2 * *'  # Run at 8 PM every other day
 jobs:
     collect_data:
       runs-on: ubuntu-latest
