@@ -8,7 +8,6 @@ on:
     - cron: '0 20 1-31/2 * *'  # Run at 8 PM every other day
 jobs:
 
-
     build:
       runs-on: ubuntu-latest
       steps:
@@ -21,14 +20,14 @@ jobs:
         - name: Build and Push Docker image to Heroku
           run: |
             echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
-            docker build -t registry.heroku.com/guarded-caverns-78210/web .
-            docker push registry.heroku.com/guarded-caverns-78210/web
+            docker build -t registry.heroku.com/jobzoeker/web .
+            docker push registry.heroku.com/jobzoeker/web
           env:
             HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
         - name: Release Docker image on Heroku
           run: |
-            heroku container:release web -a guarded-caverns-78210
+            heroku container:release web -a jobzoeker
           env:
             HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
             NOTION_KEY: ${{ secrets.NOTION_KEY }}
