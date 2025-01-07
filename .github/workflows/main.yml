@@ -7,7 +7,6 @@ on:
     - cron: '0 8 */2 * *'  # Run at 8 AM every other day
     - cron: '0 20 1-31/2 * *'  # Run at 8 PM every other day
 jobs:
-
     build:
       runs-on: ubuntu-latest
       steps:
