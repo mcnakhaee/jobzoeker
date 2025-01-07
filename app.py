@@ -1,14 +1,33 @@
 # standardize the following lines of code to use pip8 standards
+#guarded-caverns-78210
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os
 from datetime import datetime, timedelta
 import langid
 import openai
+
 import os
+from datetime import datetime, timedelta
+
+import openai
+import pandas as pd
+import streamlit as st
 from notion_client import Client
 
+x1 = [
+    'r', 'ggplot', 'data analyst', 'analytics engineer', 'data scientist',
+    'pyspark', 'data visualization', 'data journalist', 'data engineer',
+    'Data Reporting', 'Big Data', 'Statistical Analyst', 'data pipeline',
+    'R Shiny', 'R Developer'
+]
 
+x2 = [
+    'programm manager', 'HR', 'people operations', 'program coordinator',
+    'event coordinator', 'event manager', 'events', 'training',
+    'training coordinator', 'partnerships'
+]
 
 x1 = ['r', 'ggplot', 'data analyst', 'analytics engineer',
                 'data scientist', 'pyspark', 'data visualization', 'data journalist',
@@ -19,20 +38,27 @@ x2 = ['programm manager','HR','people operations',
                         'event coordinator','event manager','events',
                         'training', 'training coordinator',
                         'partnerships']
+cities_to_filter = [
+    'Den Haag', 'Amsterdam', 'Rotterdam', 'Delft', 'Utrecht', 'Leiden',
+    'Zuid-Holland', 'Werk van thuis'
+]
 
 cities_to_filter = ['Den Haag','Amsterdam','Rotterdam','Delft','Utrecht','Leiden','Zuid-Holland','Werk van thuis']
 openai_key = os.getenv("OPENAI_KEY")
 notion_key = os.getenv("NOTION_KEY")
 parent_page_id = os.getenv("parent_page_id")
+parent_page_id = os.getenv("PARENT_PAGE_ID")
 
 client = openai.OpenAI(api_key=openai_key)
 # Initialize a client
 notion = Client(auth=notion_key)
+
 pd.set_option('display.max_colwidth', None)
 database_name = "jobs"
 
 # Function to create a new page in Notion
 def create_notion_page(parent_page_id, title):
+    """Create a new page in Notion."""
     new_page = notion.pages.create(
         parent={"type": "page_id", "page_id": parent_page_id},
         properties={
@@ -48,17 +74,27 @@ def create_notion_page(parent_page_id, title):
     )
     return new_page
 # Function to extract the city name (first part before any commas)
+
+
 def extract_city_name(city):
     return city.split(',')[0].strip()  # Split by comma and take the first part, strip to remove any spaces
+    """Extract the city name (first part before any commas)."""
+    return city.split(',')[0].strip()
+
 
 # Function to truncate text in the 'Description' column
 def truncate_text(text, max_length=30):
+    """Truncate text in the 'Description' column."""
     if len(text) > max_length:
         return text[:max_length-3] + "..."
     else:
         return text
+        return text[:max_length - 3] + "..."
+    return text
+
 
 def get_data():
+    """Get data from CSV file."""
     df = pd.read_csv('jobs.csv')
     df['date_posted'] = pd.to_datetime(df['date_posted'])
     df = df.sort_values(by='date_posted', ascending=False)
@@ -66,13 +102,16 @@ def get_data():
 
 
 def filter_dataframe(data_frame, column, keyword):
+    """Filter dataframe based on keyword."""
     if keyword:
         return data_frame[data_frame[column].str.contains(keyword, case=False)]
     else:
         return data_frame
+    return data_frame
 
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
+    """Get completion from OpenAI."""
     messages = [{"role": "user", "content": prompt}]
     response = client.chat.completions.create(
         model=model,
@@ -84,6 +123,7 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 
 # Function to search if a database with a certain name exists
 def search_database(database_name):
+    """Search if a database with a certain name exists."""
     search_results = notion.search(query=database_name)
 
     for result in search_results['results']:
@@ -93,7 +133,9 @@ def search_database(database_name):
     return None
 
 # Function to create a new Notion database
+
 def create_database(database_name, parent_page_id):
+    """Create a new Notion database."""
     database = notion.databases.create(
         parent={"type": "page_id", "page_id": parent_page_id},
         title=[
@@ -128,7 +170,9 @@ def create_database(database_name, parent_page_id):
     return database['id']
 
 # Function to add rows to the Notion database
+
 def add_row_to_notion(row, database_id):
+    """Add rows to the Notion database."""
     notion.pages.create(
         parent={"database_id": database_id},
         properties={
@@ -174,6 +218,7 @@ def add_row_to_notion(row, database_id):
             "date_posted": {
                 "date": {
                     "start": row["date_posted"].strftime('%Y-%m-%d')  # Ensure this is a valid ISO 8601 date string (e.g., "2023-09-22")
+                    "start": row["date_posted"].strftime('%Y-%m-%d')
                 }
             }
 
@@ -181,6 +226,10 @@ def add_row_to_notion(row, database_id):
     )
 def add_to_notion(df,database_id,database_name,parent_page_id):
     # If the database doesn't exist, create a new one
+
+
+def add_to_notion(df, database_id, database_name, parent_page_id):
+    """Add data to Notion."""
     if not database_id:
         print(f"Database '{database_name}' not found. Creating a new database...")
         database_id = create_database(database_name, parent_page_id)
@@ -190,6 +239,7 @@ def add_to_notion(df,database_id,database_name,parent_page_id):
 
     # Add rows from the dataframe to the database
     add_row_to_notion(df, database_id)
+    print("All rows added to Notion!")
 
     print("All rows added to Notion!")
 
