@@ -7,35 +7,6 @@ on:
     - cron: '0 8 */2 * *'  # Run at 8 AM every other day
     - cron: '0 20 1-31/2 * *'  # Run at 8 PM every other day
 jobs:
-    collect_data:
-      runs-on: ubuntu-latest
-
-      steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.10.x
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements_collect_data.txt
-
-      - name: Run Python script
-        run: python get_data.py  # Replace with the actual command to run your Python script
-
-      - name: Commit files
-        run: |
-          git config --local user.name actions-user
-          git config --local user.email "actions@github.com"
-          git add .
-          git commit -am "GH ACTION Headlines $(date)"
-          git push origin main
-        env:
-          REPO_KEY: ${{secrets.GITHUB_TOKEN}}
-          username: github-actions
 
     build:
       runs-on: ubuntu-latest
@@ -49,14 +20,14 @@ jobs:
         - name: Build and Push Docker image to Heroku
           run: |
             echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
-            docker build -t registry.heroku.com/guarded-caverns-78210/web .
-            docker push registry.heroku.com/guarded-caverns-78210/web
+            docker build -t registry.heroku.com/jobzoeker/web .
+            docker push registry.heroku.com/jobzoeker/web
           env:
             HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
         - name: Release Docker image on Heroku
           run: |
-            heroku container:release web -a guarded-caverns-78210
+            heroku container:release web -a jobzoeker
           env:
             HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
             NOTION_KEY: ${{ secrets.NOTION_KEY }}
