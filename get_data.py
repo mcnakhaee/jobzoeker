@@ -15,7 +15,9 @@ import langid
 import pandas as pd
 from jobspy import scrape_jobs
 from tqdm import tqdm
-
+import os 
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 # Import Telegram notification function
 try:
     from send_to_telegram import send_jobs_to_telegram
