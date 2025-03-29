@@ -25,6 +25,7 @@ jobs:
 
       - name: Run Python script
         run: python get_data.py  # Replace with the actual command to run your Python script
+        
 
       - name: Commit files
         run: |
@@ -37,28 +38,4 @@ jobs:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
 
-    build:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v1
 
-        - name: Install Heroku CLI
-          run: |
-            curl https://cli-assets.heroku.com/install.sh | sh
-
-        - name: Build and Push Docker image to Heroku
-          run: |
-            echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
-            docker build -t registry.heroku.com/jobzoeker/web .
-            docker push registry.heroku.com/jobzoeker/web
-          env:
-            HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-
-        - name: Release Docker image on Heroku
-          run: |
-            heroku container:release web -a jobzoeker
-          env:
-            HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-            NOTION_KEY: ${{ secrets.NOTION_KEY }}
-            OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
-            parent_page_id: ${{ secrets.parent_page_id }}
