@@ -27,12 +27,13 @@ SENT_JOBS_FILE = Path("sent_jobs.csv")
 MAX_MESSAGE_LENGTH = 4096  # Telegram message character limit
 
 
-def send_to_telegram(message: str) -> Dict:
+def send_to_telegram(message: str, buttons: Optional[List[Dict[str, str]]] = None) -> Dict:
     """
-    Send a message to Telegram using the Telegram Bot API.
+    Send a message to Telegram using the Telegram Bot API with optional inline buttons.
 
     Args:
         message: The message text to send
+        buttons: A list of dictionaries representing buttons (text and callback data)
 
     Returns:
         Response from the Telegram API as a dictionary
@@ -44,21 +45,28 @@ def send_to_telegram(message: str) -> Dict:
 
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
         payload = {
-            "chat_id": TELEGRAM_CHAT_ID, 
-            "text": message, 
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": message,
             "parse_mode": "Markdown",
-            "disable_web_page_preview": False
+            "disable_web_page_preview": False,
         }
+
+        # Add inline buttons if provided
+        if buttons:
+            inline_keyboard = [[{"text": btn["text"], "callback_data": btn["callback_data"]}] for btn in buttons]
+            payload["reply_markup"] = {"inline_keyboard": inline_keyboard}
+
         response = requests.post(url, json=payload)
         result = response.json()
-        
+
         if not result.get("ok"):
             logger.error(f"Failed to send Telegram message: {result.get('description')}")
-        
+
         return result
     except Exception as e:
         logger.error(f"Error sending message to Telegram: {e}")
         return {"ok": False, "error": str(e)}
+    
 
 def format_job_message(job: pd.Series) -> str:
     """
@@ -146,6 +154,14 @@ def save_sent_jobs(df: pd.DataFrame) -> None:
         logger.error(f"Error saving sent jobs file: {e}")
 
 
+def add_job_buttons(job_id: str) -> List[Dict[str, str]]:
+    """Create buttons for a job listing."""
+    return [
+        {"text": "💾 Save Job", "callback_data": f"save_{job_id}"},
+        {"text": "👍 Interested", "callback_data": f"interested_{job_id}"},
+        {"text": "✅ Applied", "callback_data": f"applied_{job_id}"}
+    ]
+
 def send_jobs_to_telegram(jobs_df: pd.DataFrame) -> int:
     """
     Send job listings to Telegram that haven't been sent before.
@@ -179,11 +195,12 @@ def send_jobs_to_telegram(jobs_df: pd.DataFrame) -> int:
     
     logger.info(f"Sending {len(new_jobs)} new job listings to Telegram")
     
-    # Send each new job to Telegram
+    # Send each new job to Telegram with buttons
     sent_count = 0
     for _, job in new_jobs.iterrows():
         message = format_job_message(job)
-        response = send_to_telegram(message)
+        buttons = add_job_buttons(job['job_id'])
+        response = send_to_telegram(message, buttons)
         
         if response.get("ok", False):
             sent_count += 1
