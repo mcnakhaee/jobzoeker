@@ -1,119 +1,320 @@
-# refactor the following code to use pip8 standards
+"""
+Job data collection and processing script.
 
+This script scrapes job postings from multiple job sites based on search terms,
+processes the results, and saves the filtered data to CSV files.
+"""
+
+import logging
 import time
-from jobspy import scrape_jobs
-import pandas as pd
-import langid
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
+
+import langid
+import pandas as pd
+from jobspy import scrape_jobs
+from tqdm import tqdm
+
+# Import Telegram notification function
+try:
+    from send_to_telegram import send_jobs_to_telegram
+    TELEGRAM_ENABLED = True
+except ImportError:
+    TELEGRAM_ENABLED = False
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
+
+# Configuration
+SEARCH_TERMS = [
+    #'r', 'ggplot', 'data analyst', 'analytics engineer',
+    #'data scientist', 'pyspark', 'data visualization', 'data journalist',
+    #'ai engineer', 'Big Data', 'data pipeline', 'R Shiny', 
+    #'R Developer',
+      #'weaviate', 'rag', 
+      'genai'
+]
+
+JOB_SITES = ["indeed", "glassdoor", "linkedin"]
+LOCATION = "Netherlands"
+RESULTS_PER_SEARCH = 40
+MAX_AGE_DAYS = 7
+EXCLUDED_TERMS = ['PhD', 'Manager', 'Intern']
+OUTPUT_DIR = Path(".")
+RETRY_ATTEMPTS = 3
+REQUEST_DELAY = 5  # seconds between requests
+SEND_TELEGRAM_NOTIFICATIONS = True  # Enable/disable Telegram notifications
 
 
-search_terms_muhammad = ['r', 'ggplot', 'data analyst', 'analytics engineer',
-                'data scientist', 'pyspark', 'data visualization', 'data journalist',
-                         'data engineer', 'Data Reporting','Big Data','Statistical Analyst',
-                         'data pipeline', 'R Shiny','R Developer']
-search_terms_andreea = ['NGO','programm manager','HR','people operations',
-                        'program coordinator',
-                        'event coordinator','event manager',
-                         'training coordinator',
-                        'partnerships']
-
-search_terms = search_terms_muhammad #+ search_terms_andreea
-# Indeed
-# Get today's date
-today = datetime.today()
-
-df_jobs = []
-merged_df = pd.read_csv('jobs.csv')
-
-
-def detect_language(text):
+def detect_language(text: str) -> str:
     """
-    Detects the language of a given text.
+    Detect the language of a given text.
 
     Args:
-        text (str): The text to detect the language of.
+        text: The text to analyze
 
     Returns:
-        bool: True if the language is English, False otherwise.
-    """
-    lang, _ = langid.classify(text)
-    return lang == 'en'
-
-
-def detect_lang(x):
-    """
-    Detects the language of a given text.
-
-    Args:
-        x (str): The text to detect the language of.
-
-    Returns:
-        str: The detected language or 'not_detected' if detection fails.
+        The detected language code (e.g., 'en', 'nl')
     """
     try:
-        lang, _ = langid.classify(x)
+        if not isinstance(text, str) or not text.strip():
+            return 'unknown'
+        lang, _ = langid.classify(text)
         return lang
-    except:
-        return 'not_detected'
+    except Exception as e:
+        logger.warning(f"Language detection failed: {e}")
+        return 'unknown'
 
 
-def collect_data(merged_df):
+def load_existing_data(file_path: Path) -> pd.DataFrame:
     """
-    Collects job data from different sources and filters the results.
+    Load existing job data from CSV file if it exists.
 
-    This function scrapes job data from Indeed and LinkedIn for each search term in the `search_terms` list.
-    It then merges the scraped data with the existing data from the 'jobs.csv' file.
-    The function filters the merged data based on language, keyword, and job title.
-    Finally, it saves the filtered data to 'jobs.csv' and saves all the data (including duplicates) to 'all_jobs.csv'.
+    Args:
+        file_path: Path to the CSV file
+
+    Returns:
+        DataFrame containing existing job data or an empty DataFrame
     """
-    for search_term in search_terms:
-        for site in ["indeed", "glassdoor", "linkedin"]:
+    try:
+        if file_path.exists():
+            return pd.read_csv(file_path)
+        else:
+            logger.info(f"File {file_path} not found. Starting with empty dataset.")
+            return pd.DataFrame()
+    except Exception as e:
+        logger.error(f"Error loading {file_path}: {e}")
+        return pd.DataFrame()
+
+
+def scrape_job_data(
+    search_term: str, 
+    site: str, 
+    location: str = LOCATION,
+    results_wanted: int = RESULTS_PER_SEARCH,
+    hours_old: int = MAX_AGE_DAYS * 24
+) -> pd.DataFrame:
+    """
+    Scrape job listings from a specific site for a search term.
+
+    Args:
+        search_term: Term to search for
+        site: Job site to scrape ("indeed", "glassdoor", or "linkedin")
+        location: Location to search in
+        results_wanted: Maximum number of results to fetch
+        hours_old: Maximum age of job postings in hours
+
+    Returns:
+        DataFrame containing scraped job data
+    """
+    for attempt in range(RETRY_ATTEMPTS):
+        try:
+            logger.info(f"Scraping {site} for '{search_term}' in {location}")
+            
+            fetch_description = site == "linkedin"  # Only needed for LinkedIn
+            
             jobs = scrape_jobs(
                 site_name=site,
                 search_term=search_term,
-                location="Netherlands",
-                results_wanted=40,
-                hours_old=24*7,
-                linkedin_fetch_description=True,
-                country_indeed='Netherlands'  # only needed for indeed / glassdoor
+                location=location,
+                results_wanted=results_wanted,
+                hours_old=hours_old,
+                linkedin_fetch_description=fetch_description,
+                country_indeed=location if site in ["indeed", "glassdoor"] else None
             )
+            
+            if jobs.empty:
+                logger.warning(f"No results found for '{search_term}' on {site}")
+                return pd.DataFrame()
+                
             jobs['search_term'] = search_term
-            merged_df = pd.concat([merged_df,jobs], ignore_index=True)
-            time.sleep(5)
+            jobs['source'] = site
+            return jobs
+            
+        except Exception as e:
+            logger.error(f"Error scraping {site} for '{search_term}': {e}")
+            if attempt < RETRY_ATTEMPTS - 1:
+                wait_time = REQUEST_DELAY * (attempt + 1)
+                logger.info(f"Retrying in {wait_time} seconds... (Attempt {attempt + 1}/{RETRY_ATTEMPTS})")
+                time.sleep(wait_time)
+            else:
+                logger.error(f"Failed to scrape {site} for '{search_term}' after {RETRY_ATTEMPTS} attempts")
+                return pd.DataFrame()
+    
+    return pd.DataFrame()
 
 
-    all_jobs = merged_df.drop_duplicates(subset=['title', 'company','description'])
-    #all_jobs = all_jobs[all_jobs]
-    all_jobs['lang'] = all_jobs['description'].apply(lambda x: detect_lang(x))
-    filtered_df = all_jobs[all_jobs['lang'] == 'en']
-    #filtered_df = filtered_df[filtered_df['description'].str.contains('Python', case=False, na=False)]
-    filtered_df = filtered_df[~filtered_df['title'].str.contains('PhD', case=False, na=False)]
-    filtered_df = filtered_df[~filtered_df['title'].str.contains('Manager', case=False, na=False)]
-    filtered_df = filtered_df[~filtered_df['title'].str.contains('Intern', case=False, na=False)]
+def filter_jobs(df: pd.DataFrame, min_date: datetime) -> pd.DataFrame:
+    """
+    Filter job listings based on language, title keywords, and date.
 
-    # Convert 'date' column to datetime
-    filtered_df['date_posted'] = pd.to_datetime(filtered_df['date_posted'])
-    # Filter the dataframe for the last 21 days
-    last_21_days = today - timedelta(days=21)
-    filtered_df = filtered_df[filtered_df['date_posted'] >= last_21_days]
+    Args:
+        df: DataFrame containing job data
+        min_date: Minimum date to include
 
-    # Calculate the first and last day of the last month
+    Returns:
+        Filtered DataFrame
+    """
+    if df.empty:
+        return df
+
+    # Detect language in job descriptions
+    logger.info("Detecting languages in job descriptions")
+    df['lang'] = df['description'].apply(detect_language)
+    
+    # Filter by language (English only)
+    filtered = df[df['lang'] == 'en'].copy()
+    
+    # Filter out unwanted job types
+    for term in EXCLUDED_TERMS:
+        filtered = filtered[~filtered['title'].str.contains(term, case=False, na=False)]
+    
+    # Convert date column to datetime
+    filtered['date_posted'] = pd.to_datetime(filtered['date_posted'], errors='coerce')
+    
+    # Remove entries with invalid dates
+    filtered = filtered.dropna(subset=['date_posted'])
+    
+    # Keep only recent jobs
+    filtered = filtered[filtered['date_posted'] >= min_date]
+    
+    # Remove duplicates
+    filtered = filtered.drop_duplicates(subset=['title', 'company'])
+    
+    logger.info(f"Filtered from {len(df)} to {len(filtered)} jobs")
+    return filtered
+
+
+def collect_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Collect job data from multiple sources and filter the results.
+
+    Returns:
+        Tuple containing (filtered jobs DataFrame, all jobs DataFrame)
+    """
+    # Load existing data
+    jobs_file = OUTPUT_DIR / "jobs.csv"
+    merged_df = load_existing_data(jobs_file)
+    
+    # Calculate date thresholds
+    today = datetime.today()
     first_day_last_month = (today.replace(day=1) - timedelta(days=1)).replace(day=1)
-    last_day_last_month = today.replace(day=1) - timedelta(days=1)
-    filtered_df = filtered_df[(filtered_df['date_posted'] >= first_day_last_month)]
-    filtered_df.drop_duplicates(subset=['title', 'company'], inplace=True)
-    filtered_df.to_csv('jobs.csv', index=False)
-    all_jobs.to_csv('all_jobs.csv', index=False)
+    
+    # Create progress bar
+    total_searches = len(SEARCH_TERMS) * len(JOB_SITES)
+    pbar = tqdm(total=total_searches, desc="Scraping jobs")
+    
+    # Scrape jobs for each search term and site
+    all_scraped_jobs = []
+    
+    for search_term in SEARCH_TERMS:
+        for site in JOB_SITES:
+            jobs = scrape_job_data(search_term, site)
+            if not jobs.empty:
+                all_scraped_jobs.append(jobs)
+            time.sleep(REQUEST_DELAY)
+            pbar.update(1)
+    
+    pbar.close()
+    
+    # Combine all scraped jobs
+    if all_scraped_jobs:
+        scraped_df = pd.concat(all_scraped_jobs, ignore_index=True)
+        
+        # Merge with existing data
+        if not merged_df.empty:
+            combined_df = pd.concat([merged_df, scraped_df], ignore_index=True)
+        else:
+            combined_df = scraped_df
+    else:
+        logger.warning("No new jobs were scraped")
+        combined_df = merged_df
+    
+    # Process and filter the data
+    if not combined_df.empty:
+        # Remove exact duplicates
+        all_jobs = combined_df.drop_duplicates(subset=['title', 'company', 'description'])
+        
+        # Filter jobs
+        filtered_jobs = filter_jobs(all_jobs, min_date=first_day_last_month)
+        
+        return filtered_jobs, all_jobs
+    else:
+        logger.warning("No jobs data available")
+        return pd.DataFrame(), pd.DataFrame()
 
 
-def main():
+def save_data(filtered_jobs: pd.DataFrame, all_jobs: pd.DataFrame) -> None:
     """
-    Entry point of the script.
+    Save job data to CSV files.
 
-    Calls the `collect_data()` function to collect and filter job data.
+    Args:
+        filtered_jobs: DataFrame of filtered job listings
+        all_jobs: DataFrame of all job listings
     """
+    jobs_file = OUTPUT_DIR / "jobs.csv"
+    all_jobs_file = OUTPUT_DIR / "all_jobs.csv"
+    
+    try:
+        if not filtered_jobs.empty:
+            filtered_jobs.to_csv(jobs_file, index=False)
+            logger.info(f"Saved {len(filtered_jobs)} filtered jobs to {jobs_file}")
+        
+        if not all_jobs.empty:
+            all_jobs.to_csv(all_jobs_file, index=False)
+            logger.info(f"Saved {len(all_jobs)} total jobs to {all_jobs_file}")
+            
+    except Exception as e:
+        logger.error(f"Error saving data: {e}")
 
-    collect_data(merged_df)
+
+def send_telegram_notifications(filtered_jobs: pd.DataFrame) -> None:
+    """
+    Send notifications for new jobs to Telegram.
+
+    Args:
+        filtered_jobs: DataFrame of filtered job listings to notify about
+    """
+    if not TELEGRAM_ENABLED:
+        logger.warning("Telegram notifications are enabled but the send_to_telegram module couldn't be imported")
+        return
+        
+    if filtered_jobs.empty:
+        logger.info("No jobs to send notifications for")
+        return
+        
+    try:
+        logger.info("Sending job notifications to Telegram")
+        sent_count = send_jobs_to_telegram(filtered_jobs)
+        logger.info(f"Sent {sent_count} job notifications to Telegram")
+    except Exception as e:
+        logger.error(f"Error sending Telegram notifications: {e}")
+
+
+def main() -> None:
+    """Entry point of the script."""
+    logger.info("Starting job data collection")
+    
+    try:
+        start_time = time.time()
+        filtered_jobs, all_jobs = collect_data()
+        save_data(filtered_jobs, all_jobs)
+        
+        # Send Telegram notifications if enabled
+        if SEND_TELEGRAM_NOTIFICATIONS and TELEGRAM_ENABLED:
+            send_telegram_notifications(filtered_jobs)
+        
+        execution_time = time.time() - start_time
+        logger.info(f"Job data collection completed in {execution_time:.2f} seconds")
+        
+    except Exception as e:
+        logger.error(f"Error in main execution: {e}", exc_info=True)
 
 
 if __name__ == "__main__":
