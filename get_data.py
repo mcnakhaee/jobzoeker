@@ -39,7 +39,7 @@ SEARCH_TERMS = [
     #'data scientist', 'pyspark', 'data visualization', 'data journalist',
     'ai engineer'#, 'Big Data', 'data pipeline', 'R Shiny', 
     #'R Developer',
-      'weaviate', 'rag', 'ggplot','data visualization'
+      'weaviate', 'rag', 'ggplot','data visualization','generative ai',
       'genai'
 ]
 

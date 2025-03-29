@@ -60,7 +60,6 @@ def send_to_telegram(message: str) -> Dict:
         logger.error(f"Error sending message to Telegram: {e}")
         return {"ok": False, "error": str(e)}
 
-
 def format_job_message(job: pd.Series) -> str:
     """
     Format a job listing as a Telegram message with Markdown formatting.
@@ -114,7 +113,6 @@ def format_job_message(job: pd.Series) -> str:
         message = message[:MAX_MESSAGE_LENGTH - 100] + "...\n\n[Message truncated]"
     
     return message
-
 
 def load_sent_jobs() -> pd.DataFrame:
     """
