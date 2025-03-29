@@ -101,9 +101,9 @@ def format_job_message(job: pd.Series) -> str:
     if 'source' in job and pd.notna(job['source']):
         message_parts.append(f"Source: {job['source']}")
     
-    # Add apply link
-    if 'apply_link' in job and pd.notna(job['apply_link']):
-        message_parts.append(f"\n[Apply Now]({job['apply_link']})")
+    # Add job URL
+    if 'job_url' in job and pd.notna(job['job_url']):
+        message_parts.append(f"\n🔗 [View Job Posting]({job['job_url']})")
     
     # Join all parts with newlines
     message = "\n".join(message_parts)
