@@ -1,0 +1,245 @@
+id,site,job_url,job_url_direct,title,company,location,date_posted,job_type,salary_source,interval,min_amount,max_amount,currency,is_remote,job_level,job_function,listing_type,emails,description,company_industry,company_url,company_logo,company_url_direct,company_addresses,company_num_employees,company_revenue,company_description,skills,experience_range,company_rating,company_reviews_count,vacancy_count,work_from_home_type,search_term,source,lang
+in-ef478cb01ea8894f,indeed,https://nl.indeed.com/viewjob?jk=ef478cb01ea8894f,https://join.com/companies/evidencehunt/13876701-full-stack-engineer?pid=a13795120131dbe48464,Full Stack Engineer,EvidenceHunt,"Amsterdam Zuid, NH, NL",2025-03-27,,,,,,,False,,,,,"Do you love building tech that makes a real\-world difference? Are you a skilled Full\-Stack Node.js Developer who thrives in startup environments? Do you dream of shaping the future of healthcare while working with cutting\-edge AI technology?
+  
+  
+
+If yes, we want you on our team!
+  
+  
+
+Who We Are
+  
+  
+
+We are a small top performing team that is changing the way individuals conduct medical research. EvidenceHunt offers an AI\-powered research platform that streamlines the process of gathering, analyzing and utilizing medical evidence. Developed by medical professionals and health\-tech experts, our mission is to accelerate evidence\-based decision making in healthcare by making research simple, effective and reliable.
+  
+  
+
+Join us and create a lasting impact on the healthcare industry!
+  
+  
+
+Taken
+  
+  
+
+As a Full Stack Engineer at EvidenceHunt, you’ll work on exciting challenges that demand creativity, technical excellence, and a love for innovation.
+  
+  
+
+**Here’s how you’ll make an impact:**  
+
+* Build at scale: Design and develop scalable, reliable back\-end systems with Node.js and integrate them with front\-end solutions using Vue.js.
+* Shape the future: Create and improve RAG pipelines and collaborate on game\-changing features.
+* Own it: Take full ownership of your projects from concept to deployment—monitor, optimize, and continuously improve.
+* Innovate: Work closely with our Tech Lead and CEO to solve complex problems and deliver cutting\-edge solutions.
+* Push boundaries: Utilize the power of GCP services and embrace serverless architectures for seamless scalability.
+
+
+Vereisten
+  
+  
+
+We’re looking for someone with vision, talent, and drive to help us take EvidenceHunt to the next level.
+  
+  
+
+**Must\-Have Skills:**  
+
+* Experience: 4\+ years of hands\-on experience with Node.js (TypeScript \& JavaScript). Exposure to Vue.js or similar front\-end frameworks.
+* Cloud Expertise: Strong knowledge of GCP or other cloud platforms, including serverless architecture.
+* DevOps Interest: A knack for infrastructure, DevOps, and containerization.
+* Startup DNA: You thrive in fast\-paced environments having a huge impact.
+* Location Flexibility: Able to work in a hybrid setup near Amsterdam (three days from home).
+* Databases: Work with both SQL and NoSQL databases to ensure efficient and scalable data storage solutions.
+
+
+**Bonus Skills:**  
+
+* AI/ML Expertise: Experience with LLMs, RAG pipelines, or AI technologies.
+* Experience working with Elasticsearch
+* Python Proficiency: Experience with Python for ML/AI applications.
+* Advanced Education: A Master’s in Computer Science or related field.
+* Serverless Pro: Production experience with serverless architecture
+
+
+Benefits
+  
+  
+
+* Competitive Salary \+ Stock Options: Be rewarded for your work with compensation that reflects your talent and dedication.
+* Impactful Work: Contribute to a platform that empowers better healthcare outcomes worldwide.
+* Tech Playground: Work with cutting\-edge AI and cloud technologies.
+* Work\-Life Balance: Flexible hybrid working with an Amsterdam base.
+* Incredible Team: Collaborate with people who inspire, challenge, and support you
+
+
+Ready to make an impact? Join us and help shape the future of medical research!",,https://nl.indeed.com/cmp/Evidencehunt,,,,,,,,,,,,,rag,indeed,en
+in-d82d9624eaec4081,indeed,https://nl.indeed.com/viewjob?jk=d82d9624eaec4081,https://www.careers-page.com/makeyourmove1/job/QYY49359?utm_medium=free_job_board&utm_source=indeed,LLM Engineer,Make Your Move,"Utrecht, UT, NL",2025-03-24,,,,,,,True,,,,,"**Location:** Utrecht
+
+**Country:** The Netherlands
+
+**Salary:** 65k \- 80k
+
+**Description:**
+
+**Shape the Future of AI in Real Estate**
+
+
+Are you passionate about using AI to solve real\-world challenges? We are developing AI\-driven solutions for the real estate sector, and as part of our newly established AI Assistant team, you will help build innovative tools that empower NVM members with smarter and more efficient solutions.
+
+**Your Role**
+
+
+As an LLM Engineer, you will be responsible for developing and deploying large language model (LLM) applications in cloud environments. This role requires technical expertise, creativity, and collaboration to create AI solutions that set new industry standards.
+
+**Key Responsibilities**
+
+* Develop AI\-driven solutions with a focus on real\-world applications.
+* Transform prototypes into fully functional solutions that deliver measurable impact.
+* Design, evaluate, and refine LLM outputs using advanced performance metrics.
+* Collaborate with cross\-functional teams during Agile development cycles.
+* Optimize AI models for accuracy, reliability, and efficiency.
+* Present and demonstrate AI solutions to stakeholders.
+
+### **About the Company**
+
+
+We specialize in data\-driven solutions for the real estate market. As the manager of the Netherlands' largest real estate database, we use AI and machine learning to improve transparency, efficiency, and accessibility. Our goal is to provide real estate professionals with advanced tools that simplify complex processes and offer valuable insights.
+
+
+Our team consists of over 50 experts dedicated to advancing technology and data solutions. We offer a modern work environment in Utrecht with free parking, hybrid work options, and a strong focus on collaboration and work\-life balance.
+
+### **Ideal Candidate**
+
+
+We are looking for a driven professional with a strong technical background and a passion for AI innovation. If you thrive in a collaborative and autonomous environment, this role is for you.
+
+**Requirements:**
+
+* Proven experience in LLM application development and cloud deployment (AWS preferred).
+* Knowledge of Retrieval\-Augmented Generation (RAG) and prompt engineering.
+* Proficiency in Python, machine learning frameworks (TensorFlow, PyTorch, Hugging Face), SQL, Git, and APIs.
+* Experience with CI/CD pipelines, ML Ops tools, and data pipelines.
+* Fluency in English.
+* Residency in the Netherlands at the time of application.
+
+**Preferred but not required:**
+
+* Experience with Amazon Bedrock or other LLM providers (e.g., OpenAI API).
+* Background in real estate, preferably NVM Wonen.
+
+### **What We Offer**
+
+
+We foster an innovative and collaborative environment where professionals can thrive. Our technology\-driven approach ensures you work with cutting\-edge tools rather than outdated systems, allowing you to focus on creating impactful solutions.
+
+**Benefits Include:**
+
+* **Salary:** 65,000 \- 80,000 annually, based on experience.
+* **Bonuses:** 13th\-month salary included.
+* **Vacation:** 37 vacation days per year.
+* **Pension Plan:** Premium scheme with only 1% employee contribution via Zwitserleven.
+* **Tech Essentials:** Choose your preferred laptop and mobile phone or receive a 30\-monthly reimbursement.
+* **Commuting Support:** Travel allowance (0\.23 per km) or 100% reimbursed NS Business Card.
+* **Hybrid Work Setup:** Flexible home\-office options with a 2\.40 daily remote work allowance.
+* **Professional Development:** 1,500 annual training budget.
+* **Insurance Discounts:** Up to 10% discount on health insurance via Zilveren Kruis.
+
+### **Working Conditions**
+
+* Hybrid work model: 3 days in the office, 2 days remote.
+* Visa sponsorship and relocation are not available.
+
+### **Company Culture**
+
+* Informal and collaborative work environment.
+* Diverse and inclusive teams.
+* A culture of trust with self\-managing teams and freedom for individual initiatives.
+
+**Heads up!**  
+
+We’re on the hunt for top talent on behalf of our awesome client! If this sounds like your kind of gig, hit that *apply* button! Only shortlisted candidates will be contacted, and we keep things 100% confidential. We’re all about equal opportunities here—everyone’s welcome!",,https://nl.indeed.com/cmp/Make-Your-Move-1,,,,,,,,,,,,,rag,indeed,en
+in-f22f2029cc06e161,indeed,https://nl.indeed.com/viewjob?jk=f22f2029cc06e161,http://nl.indeed.com/job/llm-engineer-f22f2029cc06e161,LLM Engineer,Cobix Arge Technologies,"Utrecht Leidsche Rijn, UT, NL",2025-03-24,fulltime,,,,,,True,,,,,"**Location:** Utrecht
+
+**Country:** The Netherlands
+
+**Salary:** €65k \- €80k
+
+**Start Date:**
+
+**Description:**
+
+**Shape the Future of AI in Real Estate**
+
+Are you passionate about using AI to solve real\-world challenges? We are developing AI\-driven solutions for the real estate sector, and as part of our newly established AI Assistant team, you will help build innovative tools that empower NVM members with smarter and more efficient solutions.
+
+**Your Role**
+
+As an LLM Engineer, you will be responsible for developing and deploying large language model (LLM) applications in cloud environments. This role requires technical expertise, creativity, and collaboration to create AI solutions that set new industry standards.
+
+**Key Responsibilities**
+
+* Develop AI\-driven solutions with a focus on real\-world applications.
+* Transform prototypes into fully functional solutions that deliver measurable impact.
+* Design, evaluate, and refine LLM outputs using advanced performance metrics.
+* Collaborate with cross\-functional teams during Agile development cycles.
+* Optimize AI models for accuracy, reliability, and efficiency.
+* Present and demonstrate AI solutions to stakeholders.
+
+**About the Company**
+
+We specialize in data\-driven solutions for the real estate market. As the manager of the Netherlands’ largest real estate database, we use AI and machine learning to improve transparency, efficiency, and accessibility. Our goal is to provide real estate professionals with advanced tools that simplify complex processes and offer valuable insights.
+
+Our team consists of over 50 experts dedicated to advancing technology and data solutions. We offer a modern work environment in Utrecht with free parking, hybrid work options, and a strong focus on collaboration and work\-life balance.
+
+**Ideal Candidate**
+
+We are looking for a driven professional with a strong technical background and a passion for AI innovation. If you thrive in a collaborative and autonomous environment, this role is for you.
+
+**Requirements:**
+
+* Proven experience in LLM application development and cloud deployment (AWS preferred).
+* Knowledge of Retrieval\-Augmented Generation (RAG) and prompt engineering.
+* Proficiency in Python, machine learning frameworks (TensorFlow, PyTorch, Hugging Face), SQL, Git, and APIs.
+* Experience with CI/CD pipelines, ML Ops tools, and data pipelines.
+* Fluency in English.
+* Residency in the Netherlands at the time of application.
+
+**Preferred but not required:**
+
+* Experience with Amazon Bedrock or other LLM providers (e.g., OpenAI API).
+* Background in real estate, preferably NVM Wonen.
+
+**What We Offer**
+
+We foster an innovative and collaborative environment where professionals can thrive. Our technology\-driven approach ensures you work with cutting\-edge tools rather than outdated systems, allowing you to focus on creating impactful solutions.
+
+**Benefits Include:**
+
+* **Salary:** €65,000 \- €80,000 annually, based on experience.
+* **Bonuses:** 13th\-month salary included.
+* **Vacation:** 37 vacation days per year.
+* **Pension Plan:** Premium scheme with only 1% employee contribution via Zwitserleven.
+* **Tech Essentials:** Choose your preferred laptop and mobile phone or receive a €30 monthly reimbursement.
+* **Commuting Support:** Travel allowance (€0\.23 per km) or 100% reimbursed NS Business Card.
+* **Hybrid Work Setup:** Flexible home\-office options with a €2\.40 daily remote work allowance.
+* **Professional Development:** €1,500 annual training budget.
+* **Insurance Discounts:** Up to 10% discount on health insurance via Zilveren Kruis.
+
+**Working Conditions**
+
+* Hybrid work model: 3 days in the office, 2 days remote.
+* Visa sponsorship and relocation are not available.
+
+**Company Culture**
+
+* Informal and collaborative work environment.
+* Diverse and inclusive teams.
+* A culture of trust with self\-managing teams and freedom for individual initiatives.
+
+Job Type: Full\-time
+
+Pay: €65\.000,00 \- €80\.000,00 per year
+
+Work Location: In person",,https://nl.indeed.com/cmp/Cobix-Arge-Technologies,,,,,,,,,,,,,rag,indeed,en
