@@ -297,16 +297,58 @@ def send_telegram_notifications(filtered_jobs: pd.DataFrame) -> None:
         logger.error(f"Error sending Telegram notifications: {e}")
 
 
+def send_telegram_test_message() -> bool:
+    """
+    Send a test message to Telegram to verify the connection.
+    
+    Returns:
+        True if message was sent successfully, False otherwise
+    """
+    if not TELEGRAM_ENABLED:
+        logger.warning("Telegram notifications are disabled or couldn't be imported")
+        return False
+    
+    try:
+        logger.info("Sending test message to Telegram")
+        from send_to_telegram import send_to_telegram
+        
+        test_message = (
+            "*Job Scraper System Test*\n\n"
+            "✅ This is a test message from the job scraper system.\n"
+            f"🕒 System time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            f"🔍 Search terms: {len(SEARCH_TERMS)} terms configured\n"
+            f"🌐 Sites: {', '.join(JOB_SITES)}\n"
+            "📊 The job notification system is working correctly."
+        )
+        
+        response = send_to_telegram(test_message)
+        success = response.get("ok", False)
+        
+        if success:
+            logger.info("Test message sent successfully")
+        else:
+            logger.error(f"Failed to send test message: {response.get('description', 'Unknown error')}")
+        
+        return success
+    except Exception as e:
+        logger.error(f"Error sending test message to Telegram: {e}")
+        return False
+
+
 def main() -> None:
     """Entry point of the script."""
     logger.info("Starting job data collection")
     
     try:
+        # Send a test message to verify Telegram setup
+        if SEND_TELEGRAM_NOTIFICATIONS and TELEGRAM_ENABLED:
+            send_telegram_test_message()
+        
         start_time = time.time()
         filtered_jobs, all_jobs = collect_data()
         save_data(filtered_jobs, all_jobs)
         
-        # Send Telegram notifications if enabled
+        # Send actual job notifications if enabled
         if SEND_TELEGRAM_NOTIFICATIONS and TELEGRAM_ENABLED:
             send_telegram_notifications(filtered_jobs)
         
