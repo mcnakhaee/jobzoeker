@@ -4,3 +4,4 @@ langid
 openai
 python-dotenv
 notion-client
+tqdm
