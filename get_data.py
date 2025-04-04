@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 SEARCH_TERMS = [
     #'r', 'ggplot', 'data analyst', 'analytics engineer',
     #'data scientist', 'pyspark', 'data visualization', 'data journalist',
-    'ai engineer'#, 'Big Data', 'data pipeline', 'R Shiny', 
+    'ai engineer', #'Big Data', 'data pipeline', 'R Shiny', 
     #'R Developer',
       'weaviate', 'rag', 'ggplot','data visualization','generative ai',
       'genai' ,'llm','azure ai','openai','gpt','llama']
