@@ -40,7 +40,7 @@ SEARCH_TERMS = [
     'ai engineer'#, 'Big Data', 'data pipeline', 'R Shiny', 
     #'R Developer',
       'weaviate', 'rag', 'ggplot','data visualization','generative ai',
-      'genai' ,'llm','azure ai','openai','gpt','llama'
+      'genai' ,'llm','azure ai','openai','gpt','llama']
 
 JOB_SITES = ["indeed", "glassdoor", "linkedin"]
 LOCATION = "Netherlands"
