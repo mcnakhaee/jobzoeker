@@ -94,19 +94,74 @@ def load_existing_data(file_path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def scrape_job_data(
-    search_term: str, 
-    site: str, 
+def scrape_linkedin_jobs(
+    search_term: str,
     location: str = LOCATION,
     results_wanted: int = RESULTS_PER_SEARCH,
     hours_old: int = MAX_AGE_DAYS * 24
 ) -> pd.DataFrame:
     """
-    Scrape job listings from a specific site for a search term.
+    Scrape job listings specifically from LinkedIn with optimized parameters.
 
     Args:
         search_term: Term to search for
-        site: Job site to scrape ("indeed", "glassdoor", or "linkedin")
+        location: Location to search in
+        results_wanted: Maximum number of results to fetch
+        hours_old: Maximum age of job postings in hours
+
+    Returns:
+        DataFrame containing scraped LinkedIn job data
+    """
+    for attempt in range(RETRY_ATTEMPTS):
+        try:
+            logger.info(f"Scraping LinkedIn for '{search_term}' in {location}")
+            
+            # LinkedIn specific parameters
+            jobs = scrape_jobs(
+                site_name="linkedin",
+                search_term=search_term,
+                location=location,
+                results_wanted=20,
+                hours_old=hours_old,
+                linkedin_fetch_description=True,  # Always fetch descriptions for LinkedIn
+                page_timeout=30,  # Increase timeout for LinkedIn
+                max_retries=3     # Add extra retries specifically for LinkedIn
+            )
+            
+            if jobs.empty:
+                logger.warning(f"No results found for '{search_term}' on LinkedIn")
+                jobs = pd.DataFrame()
+                
+            jobs['search_term'] = search_term
+            jobs['source'] = "linkedin"
+            return jobs
+            
+        except Exception as e:
+            logger.error(f"Error scraping LinkedIn for '{search_term}': {e}")
+            if attempt < RETRY_ATTEMPTS - 1:
+                wait_time = REQUEST_DELAY * (attempt + 2)  # Longer delay for LinkedIn
+                logger.info(f"Retrying LinkedIn in {wait_time} seconds... (Attempt {attempt + 1}/{RETRY_ATTEMPTS})")
+                time.sleep(wait_time)
+            else:
+                logger.error(f"Failed to scrape LinkedIn for '{search_term}' after {RETRY_ATTEMPTS} attempts")
+                return pd.DataFrame()
+    
+    return pd.DataFrame()
+
+
+def scrape_other_jobs(
+    search_term: str,
+    site: str,  # 'indeed' or 'glassdoor'
+    location: str = LOCATION,
+    results_wanted: int = RESULTS_PER_SEARCH,
+    hours_old: int = MAX_AGE_DAYS * 24
+) -> pd.DataFrame:
+    """
+    Scrape job listings from Indeed or Glassdoor.
+
+    Args:
+        search_term: Term to search for
+        site: Job site to scrape ("indeed" or "glassdoor")
         location: Location to search in
         results_wanted: Maximum number of results to fetch
         hours_old: Maximum age of job postings in hours
@@ -114,11 +169,13 @@ def scrape_job_data(
     Returns:
         DataFrame containing scraped job data
     """
+    if site not in ["indeed", "glassdoor"]:
+        logger.error(f"Invalid site: {site}. Must be 'indeed' or 'glassdoor'.")
+        return pd.DataFrame()
+        
     for attempt in range(RETRY_ATTEMPTS):
         try:
             logger.info(f"Scraping {site} for '{search_term}' in {location}")
-            
-            fetch_description = site == "linkedin"  # Only needed for LinkedIn
             
             jobs = scrape_jobs(
                 site_name=site,
@@ -126,8 +183,7 @@ def scrape_job_data(
                 location=location,
                 results_wanted=results_wanted,
                 hours_old=hours_old,
-                linkedin_fetch_description=fetch_description,
-                country_indeed=location if site in ["indeed", "glassdoor"] else None
+                country_indeed=location  # Use location for country
             )
             
             if jobs.empty:
@@ -149,6 +205,36 @@ def scrape_job_data(
                 return pd.DataFrame()
     
     return pd.DataFrame()
+
+
+def scrape_job_data(
+    search_term: str, 
+    site: str, 
+    location: str = LOCATION,
+    results_wanted: int = RESULTS_PER_SEARCH,
+    hours_old: int = MAX_AGE_DAYS * 24
+) -> pd.DataFrame:
+    """
+    Scrape job listings from a specific site for a search term.
+    This is a wrapper function that calls the appropriate specialized function.
+
+    Args:
+        search_term: Term to search for
+        site: Job site to scrape ("indeed", "glassdoor", or "linkedin")
+        location: Location to search in
+        results_wanted: Maximum number of results to fetch
+        hours_old: Maximum age of job postings in hours
+
+    Returns:
+        DataFrame containing scraped job data
+    """
+    if site == "linkedin":
+        return scrape_linkedin_jobs(search_term, location, results_wanted, hours_old)
+    elif site in ["indeed", "glassdoor"]:
+        return scrape_other_jobs(search_term, site, location, results_wanted, hours_old)
+    else:
+        logger.error(f"Unsupported site: {site}")
+        return pd.DataFrame()
 
 
 def filter_jobs(df: pd.DataFrame, min_date: datetime) -> pd.DataFrame:
@@ -212,19 +298,41 @@ def collect_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     pbar = tqdm(total=total_searches, desc="Scraping jobs")
     
     # Scrape jobs for each search term and site
-    all_scraped_jobs = []
+    linkedin_jobs = []
+    other_jobs = []
     
     for search_term in SEARCH_TERMS:
-        for site in JOB_SITES:
-            jobs = scrape_job_data(search_term, site)
+        # First scrape from LinkedIn
+        if "linkedin" in JOB_SITES:
+            jobs = scrape_linkedin_jobs(search_term)
             if not jobs.empty:
-                all_scraped_jobs.append(jobs)
+                linkedin_jobs.append(jobs)
+            time.sleep(REQUEST_DELAY * 2)  # Longer delay after LinkedIn
+            pbar.update(1)
+        
+        # Then scrape from other sites
+        for site in [s for s in JOB_SITES if s != "linkedin"]:
+            jobs = scrape_other_jobs(search_term, site)
+            if not jobs.empty:
+                other_jobs.append(jobs)
             time.sleep(REQUEST_DELAY)
             pbar.update(1)
     
     pbar.close()
     
     # Combine all scraped jobs
+    all_scraped_jobs = []
+    
+    if linkedin_jobs:
+        logger.info(f"Successfully scraped {len(linkedin_jobs)} LinkedIn searches")
+        all_scraped_jobs.extend(linkedin_jobs)
+    else:
+        logger.warning("No LinkedIn jobs were scraped")
+    
+    if other_jobs:
+        logger.info(f"Successfully scraped {len(other_jobs)} Indeed/Glassdoor searches")
+        all_scraped_jobs.extend(other_jobs)
+    
     if all_scraped_jobs:
         scraped_df = pd.concat(all_scraped_jobs, ignore_index=True)
         
